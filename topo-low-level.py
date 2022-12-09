@@ -42,10 +42,10 @@ print("host h4 has IP address",h4.IP())
 print("ping test between host h1 and h2")
 
 # perform ping test between host "h1" & "h2"
-print h1.cmd('ping -c2',h2.IP())
+print (h1.cmd('ping -c2',h2.IP()))
 
 # stop switch "s1"
 s1.stop()
 
-#stop controller
+# stop controller
 c0.stop()
