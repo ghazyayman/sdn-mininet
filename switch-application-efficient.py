@@ -1,19 +1,24 @@
 
 from pox.core import core
+# import "IPAddr" & "EthAddr" class
 from pox.lib.addresses import IPAddr, EthAddr
 import pox.openflow.libopenflow_01 as of
 
 class Switch:
   def __init__ (self, connection):
     self.connection = connection
+    # initialize macToPort dictionary
     self.macToPort = {}
 
     connection.addListeners(self)
 
   def _handle_PacketIn (self, event):
+    #extract port from event & store in variable
     in_port=event.port
+    #extract dpid from event & store it in variable
     dpid=event.dpid
    
+   #extract frame from event & store it in variable
     packet = event.parsed
     eth = packet.find("ethernet")
     self.macToPort[eth.src]=in_port
