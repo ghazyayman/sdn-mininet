@@ -49,11 +49,14 @@ class Switch:
 
 #handler function which specifies what to do when ConnectionUp happens
 def _handle_ConnectionUp (event):
-    
+    #location of policy file
     policyFile = "%s/pox/pox/forwarding/firewall-mac-policies.csv" % os.environ['HOME']
+	#open file in read mode
     rules_file = open(policyFile,"r")
+	#create list of rules from policy file
     rules=[rule.strip()for rule in rules_file]
     for i in range(len(rules)):
+		#install firewall rules when ConnectionUp event occurs
 	rule_list=rules[i].split(' ')
 	fw_add_rule=of.ofp_flow_mod()
 	fw_add_rule.match=of.ofp_match()
@@ -61,7 +64,10 @@ def _handle_ConnectionUp (event):
 	fw_add_rule.match.dl_dst=EthAddr(rule_list[1])
 	event.connection.send(fw_add_rule)
 	
+	#call switch module
     Switch(event.connection)
 
+#is used for initializing pox component
 def launch ():
+	#specify handler function when ConnectionUp occurs
   core.openflow.addListenerByName("ConnectionUp", _handle_ConnectionUp)
