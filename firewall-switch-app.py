@@ -5,14 +5,14 @@ import pox.openflow.libopenflow_01 as of
 import os
 
 class Switch:
-  def __init__ (self, connection):
-    self.connection = connection
-	# Initialize macToPort Dictionary
-    self.macToPort = {}
+ def __init__ (self, connection):
+     self.connection = connection
+ 	# Initialize macToPort Dictionary
+     self.macToPort = {}
+ 
+     connection.addListeners(self)
 
-    connection.addListeners(self)
-
-  def _handle_PacketIn (self, event):
+def _handle_PacketIn (self, event):
 	# extract port from event & store it in variable
     in_port=event.port
 	# extract dpid from event & store it in variable
@@ -24,28 +24,28 @@ class Switch:
 	#insert entry based on source mac into dictionary 
     self.macToPort[eth.src]=in_port
 	# if destination mac is in  dictionary, then send packet to corresponding port otherwise flood
-    if eth.dst in self.macToPort:
+if eth.dst in self.macToPort:
 	out_port=self.macToPort[eth.dst]
-    else:
+else:
 	out_port=of.OFPP_FLOOD
     
 	# install flow entry into device
-    if out_port!=of.OFPP_FLOOD:
-    	    msg = of.ofp_flow_mod()
-	    msg.match = of.ofp_match()
-	    msg.match.dl_dst=eth.dst
-	    msg.match.in_port=event.port
-	    msg.idle_timeout = 10
-	    msg.hard_timeout = 30
-	    msg.actions.append(of.ofp_action_output(port = out_port))
-	    msg.data = event.ofp 
- 	    self.connection.send(msg)
-	#create an instruction "msg" for sending packet out
-    else:
-  	msg = of.ofp_packet_out()
-  	msg.actions.append(of.ofp_action_output(port = out_port))
-    	msg.data = event.ofp 
-    	self.connection.send(msg)
+if out_port!=of.OFPP_FLOOD:
+							msg = of.ofp_flow_mod()
+							msg.match = of.ofp_match()
+							msg.match.dl_dst=eth.dst
+							msg.match.in_port=event.port
+							msg.idle_timeout = 10
+							msg.hard_timeout = 30
+							msg.actions.append(of.ofp_action_output(port = out_port))
+							msg.data = event.ofp 
+							self.connection.send(msg)
+#create an instruction "msg" for sending packet out
+else:
+	msg = of.ofp_packet_out()
+	msg.actions.append(of.ofp_action_output(port = out_port))
+	msg.data = event.ofp 
+	self.connection.send(msg)
 
 #handler function which specifies what to do when ConnectionUp happens
 def _handle_ConnectionUp (event):
@@ -65,7 +65,7 @@ def _handle_ConnectionUp (event):
 	event.connection.send(fw_add_rule)
 	
 	#call switch module
-    Switch(event.connection)
+Switch(event.connection)
 
 #is used for initializing pox component
 def launch ():
